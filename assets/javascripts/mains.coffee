@@ -34,30 +34,67 @@ startApp = ->
   web3.eth.getAccounts (err,res) ->
     console.log('Account' + res[0])
     $("#fund-from").val res[0]
+    checkAddressBalance 0
 
   $("#change-contract").click ->
-    $("#contractAddr").text $("#contractaddress").val()
-    $("#contractaddress").val ""
+    new_contract_address = $("#contractaddress").val()
+    if web3.isAddress(new_contract_address)
+      $("#contractAddr").text $("#contractaddress").val()
+      $("#contractaddress").val ""
+    else
+      alert "Check Contract Address"
+
+  $("#change-address").click ->
+    new_address = $("#fund-from").val()
+    $(".address-balance").text "Check Now"
+    if web3.isAddress(new_address)
+      checkAddressBalance 0
+    else
+      alert "Check Contract Address"
+
+
 
   $("#do-fund").click ->
-    dapp.donate {from: web3.eth.accounts[0], to: $("#contractAddr").val() , value: web3.toWei $("#fund-amount").val()  }, (err, res) ->
-      tryTillResponse res, (error, receipt) ->
-        alert 'done ' + res
+    if parseInt($(".address-balance").text()) <= parseInt(web3.toWei($("#fund-amount").val()))
+      alert "Address Amount is not Enough"
+    else
+      dapp.donate {from: web3.eth.accounts[0], to: $("#contractAddr").val() , value: web3.toWei $("#fund-amount").val()  }, (err, res) ->
+        tryTillResponse res, (error, receipt) ->
+          alert 'done ' + res
 
 # Reference : https://medium.com/@ggogun/web3js-%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%9D%B4%EB%8D%94%EB%A6%AC%EC%9B%80-%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC-%EA%B5%AC%EB%B6%84-ea3dc9da43d8
 checkCurrentNetwork = ->
+  if !web3.isConnected()
+    $(".connect-status").addClass "badge-danger"
+    $(".connect-status").removeClass "badge-primary"
+    $(".connect-status").text "DisConnected"
+
   current_network = web3.version.network
   switch(current_network)
     when "1"
       console.log("Current Network (" + current_network + ") : Main Network")
+      $(".connect-network").text "Main Network"
     when "3"
       console.log("Current Network (" + current_network + ") : Ropsten Network")
+      $(".connect-network").text "Ropsten Network"
     when "42"
       console.log("Current Network (" + current_network + ") : Kovan Network")
+      $(".connect-network").text "Kovan Network"
     when "4"
       console.log("Current Network (" + current_network + ") : Rinkeby Network")
+      $(".connect-network").text "Rinkeby Network"
     else
       console.log("Current Network (" + current_network + ") : Unknown Network or Local Network")
+      $(".connect-network").text "Local Network"
+
+checkAddressBalance = (index) ->
+  if index is 0
+    web3.eth.getBalance $("#fund-from").val(), (err, res) ->
+      $(".address-balance").text res
+  else if index is 1
+    web3.eth.getBalance $("#fund-from").val(), (err, res) ->
+      $(".address-balance").text res
+  else
 
 tryTillResponse = (txhash, done) ->
     document.getElementById('wait').innerHTML = 'waiting for the transaction to be mined ...'

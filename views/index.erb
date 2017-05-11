@@ -1,12 +1,18 @@
 <div>
     <div>Donation Contract Sample</div>
     <br/>
+    <div class="dashboard">
+      <span class="badge badge-primary connect-status">Connected</span>
+      <span class="badge badge-warning connect-network">Network</span>
+    </div>
     <input id='contractaddress' placeholder='contract address'></intput>
     <button id="change-contract" >Change Contract</button>
     <div>CurrentContract : <span id="contractAddr">Loading..</span></div>
     <br/>
     <div>
+      <span class="badge badge-warning address-balance">Check Now</span>
         <input id="fund-from" placeholder="Fund from"></intput>
+        <button id="change-address" >Change Address</button>
         <input placeholder='amount' id='fund-amount'></intput>
         <button id="do-fund" >Funding</button>
         <br/>
@@ -26,18 +32,6 @@
 </div>
 
 <script type="text/javascript">
-function donate () {
-    var donation = contractspec.at(document.getElementById('contractaddress').value)
-    donation.donate({
-        from: document.getElementById('fromGive').value,
-        value: document.getElementById('valueGive').value
-    }, function (error, txHash) {
-        tryTillResponse(txHash, function (error, receipt) {
-            alert('done ' + txHash)
-        })
-    })
-}
-
 function movefund () {
     var donation = contractspec.at(document.getElementById('contractaddress').value)
     donation.moveFund(
