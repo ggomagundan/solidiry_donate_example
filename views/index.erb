@@ -1,64 +1,74 @@
 <div>
-    <div>Donation Contract Sample</div>
-    <br/>
-    <div class="dashboard">
-      <span class="badge badge-primary connect-status">Connected</span>
-      <span class="badge badge-warning connect-network">Network</span>
+  <h1>Donation Contract Sample</h1>
+
+  <div class="card mb-3">
+    <div class="card-block">
+      Network : <span class="badge badge-primary connect-status">Connected</span>
+      Current Network Name : <span class="badge badge-warning connect-network">Network</span>
     </div>
-    <input id='contractaddress' placeholder='contract address'></intput>
-    <button id="change-contract" >Change Contract</button>
-    <div>CurrentContract : <span id="contractAddr">Loading..</span></div>
-    <br/>
-    <div>
-      <span class="badge badge-warning address-balance">Check Now</span>
-        <input id="fund-from" placeholder="Fund from"></intput>
-        <button id="change-address" >Change Address</button>
-        <input placeholder='amount' id='fund-amount'></intput>
-        <button id="do-fund" >Funding</button>
-        <br/>
-        <br/>
-        <input id='from-move-fund' placeholder='from' ></intput>
-        <input id='move-fund-to' placeholder='move to' ></intput>
-        <input id='amount-to-move' placeholder='amount' ></intput>
-        <button id="move-fund" onclick="move_und()">moveFund</button>
-        <br/>
-        <br/>
-        <div id='wait' ></div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-block">
+      <div class="form-group">
+        <label for="new-contract-address">New Contract Address</label>
+        <div class="form-inline">
+          <input type="text" class="form-control col-sm-5" id="new-contract-address" aria-describedby="new contract" placeholder="Enter new Contract Address">
+          <button id="change-contract" class="btn btn-success" >Change Contract</button>
+        </div>
+        <div>
+          <div class="badge badge-primary">CurrentContract : <span id="contractAddr">Loading..</span></div>
+          <div class="badge badge-primary">CurrentContractBalance : <span id="contract-balance">Loading..</span> Ether</div>
+        </div>
+      </div>
     </div>
-    <br/>
-    <br/>
-    <div id='log'>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-block">
+      <div class="form-group">
+        <label for="new-contract-address col-sm-12 mb-6">New Funding</label>
+        <div class="form-inline">
+          <input type="text" class="form-control col-sm-5 mr-3" id="fund-from" aria-describedby="fund Address" placeholder="Enter Fund Address">
+          <div class="input-group col-sm-5 mr-3">
+            <span class="input-group-addon" id="">Ξ</span>
+            <input type="text" class="form-control" id="fund-amount" aria-describedby="fund Amount" placeholder="Enter Fund Balance">
+          </div>
+          <button id="do-fund" class="btn btn-success" >Do Funding</button>
+        </div>
+        <button id="change-address" class="btn btn-success" >Change Address</button>
+        <div class="badge badge-warning">
+          Current Account Balance : <span class="address-balance">Check Now</span>
+           Ether
+        </div>
+      </div>
     </div>
+  </div>
+
+
+  <div class="card mb-3">
+    <div class="card-block">
+      <div class="form-group">
+        <label for="new-contract-address col-sm-12 mb-6">Move Funded Ether</label>
+        <input type="text" class="form-control col-sm-5 mr-3" id="from-move-fund" aria-describedby="fund Address" placeholder="Enter Fund Address" disable>
+        <div class="form-inline">
+          <input type="text" class="form-control col-sm-5 mr-3" id="move-fund-to" aria-describedby="send Address" placeholder="Enter Sending Address">
+          <div class="input-group col-sm-5 mr-3">
+            <span class="input-group-addon" id="">Ξ</span>
+            <input type="text" class="form-control" id="amount-to-move" aria-describedby="fund Amount" placeholder="Enter Sending Balance">
+          </div>
+          <button id="move-fund" class="btn btn-success" >Send Funded Eth</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-block">
+      <h5> Logs </h5>
+      <div id='log'>
+      </div>
+    </div>
+  </div>
 </div>
 
-<script type="text/javascript">
-function movefund () {
-    var donation = contractspec.at(document.getElementById('contractaddress').value)
-    donation.moveFund(
-        document.getElementById('moveFundTo').value,
-        document.getElementById('amountToMove').value,
-        function (error, txHash) {
-            tryTillResponse(txHash, function (error, receipt) {
-                alert('done ' + txHash)
-            })
-        })
-}
-
-var contractspec = web3.eth.contract([{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"moveFund","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"donate","outputs":[],"payable":true,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_to","type":"address"},{"indexed":false,"name":"_amount","type":"uint256"}],"name":"fundMoved","type":"event"}]);
-
-function tryTillResponse (txhash, done) {
-    document.getElementById('wait').innerHTML = 'waiting for the transaction to be mined ...'
-    web3.eth.getTransactionReceipt(txhash, function (err, result) {
-        if (!err && !result) {
-            // Try again with a bit of delay
-            setTimeout(function () { tryTillResponse(txhash, done) }, 500)
-        } else {
-            document.getElementById('wait').innerHTML = ''
-            var log = document.createElement("div")
-            log.innerHTML = JSON.stringify(result)
-            document.getElementById('log').appendChild(log)
-            done(err,result)
-        }
-    })
-}
-</script>
